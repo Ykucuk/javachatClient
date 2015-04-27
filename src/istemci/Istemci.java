@@ -9,7 +9,8 @@ package istemci;
  *
  * @author Yasin
  */
-import content.Mesaj;
+import content.*;
+import gui.kullaniciWindow;
 import gui.mainClientWindow;
 import java.net.Socket;
 import java.io.*;
@@ -23,13 +24,14 @@ public class Istemci extends Thread {
 
     Boolean GirisDurumu = false;
 
-    Mesaj GelenMesaj = null;
+    Icerik GelenIcerik = null;
     mainClientWindow mCl;
+    Durum durum;
 
     public Istemci(mainClientWindow sum) {
 
         try {
-            mijnSock = new Socket("192.168.2.100", 1234);
+            mijnSock = new Socket("192.168.2.45", 1234);
             oos = new ObjectOutputStream(this.mijnSock.getOutputStream());
             ois = new ObjectInputStream(this.mijnSock.getInputStream());
             this.mCl = sum;
@@ -47,21 +49,38 @@ public class Istemci extends Thread {
         try {
             while (true) {
 
-                GelenMesaj = (Mesaj) ois.readObject();
+                this.GelenIcerik = (Icerik) this.ois.readObject();
+                if (this.GelenIcerik.getTur() == 'D') {
+                    // Buraya sadece bilgilendirme icin kullaniliyor, durum sinifi ni burada kullaniyoruz.
 
-                if (GelenMesaj.getTur().equals("/girisyap")) {
-                    mCl.outputEkle(GelenMesaj.getMesaj());
-                    mCl.KilidiKapat();
-                } else if (GelenMesaj.getTur().equals("/global")) {
-                    mCl.outputEkle(GelenMesaj.getMesaj());
+                    this.durum = (Durum) this.GelenIcerik;
+
+                    if (this.durum.getDurumTur() == 'G') {
+                        if (this.durum.getGirisDurumu() == true) {
+                            mCl.outputEkle("giris oldu");
+                            mCl.GRW.dispose();
+                            mCl.KLW = new kullaniciWindow(mCl);
+                            mCl.jDesktopPane1.add(mCl.KLW);
+                        } else {
+                            System.out.println("Giris basarisiz tekrar deneyiniz.");
+                        }
+                    } else {
+                       System.out.println("Durum baska birsey icin heaa..");
+                    }
+
+                } else if (this.GelenIcerik.getTur() == 'M') {
+                    // normal gelen mesajlar...
+                    Mesaj msj = (Mesaj) this.GelenIcerik;
+                    System.out.println(msj.getMesaj());
                 }
+
             }
         } catch (Exception e) {
             System.err.println("baglanti kapatildi.");
         }
     }
 
-    public void Ilet(Mesaj obj) {
+    public void Ilet(Icerik obj) {
         try {
             oos.writeObject(obj);
             oos.flush();
