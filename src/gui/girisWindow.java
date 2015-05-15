@@ -5,7 +5,7 @@
  */
 package gui;
 
-import content.Giris;
+import icerik.Giris;
 
 /**
  *

@@ -9,7 +9,9 @@ package istemci;
  *
  * @author Yasin
  */
-import content.*;
+import icerik.Mesaj;
+import icerik.Icerik;
+import icerik.Durum;
 import gui.kullaniciWindow;
 import gui.mainClientWindow;
 import java.net.Socket;

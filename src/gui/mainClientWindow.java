@@ -5,7 +5,8 @@
  */
 package gui;
 
-import content.*;
+import icerik.Mesaj;
+import icerik.Giris;
 import istemci.Istemci;
 
 /**
